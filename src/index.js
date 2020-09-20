@@ -74,7 +74,7 @@ function createParagraph(content, bsColor, character){
 }
 
 function getWeather(cityName){
-    if(cityName != "" || cityName != null || cityName != undefined || !cityName){
+    if(cityName && (cityName != "" || cityName != null || cityName != undefined)){
         const QUERY_URL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${API_KEY}&units=metric`
         fetch(QUERY_URL)
         .then(
@@ -93,6 +93,9 @@ function getWeather(cityName){
                 speak(`The teperature in ${cityName} is ${data.main.temp.toString()} Celsius and atmosphere is ${data.weather[0].description.toString()} and has an humidity of ${data.main.humidity.toString()}`);
             }
         )
+    } else {
+        createParagraph("You have to state a location 📢","danger", "Bot");
+        speak("You have to state a location");
     }
 }
 
@@ -110,8 +113,10 @@ themeSwitcherBtn.addEventListener("click", () => {
 listenBtn.addEventListener("click", ()=>{
     buttonColorChanger();
     recognition.start();
+    listenBtn.classList.add("pulse");
     setTimeout(()=>{
         recognition.stop();
+        listenBtn.classList.remove("pulse");
     },DURATION)
 });
 
@@ -122,40 +127,26 @@ recognition.addEventListener("result", (e)=>{
 recognition.addEventListener("error", (e)=>{
     createParagraph("An error occured try again 🙏", "danger", "Bot");
     speak("An error occured try again");
-    console.log(e);
 });
 
 recognition.addEventListener("end", (e)=>{
     if(text_content == "") {
         return;
     }
-
-    if(text_content == "who are you") {
-        createParagraph("I'm a trash bot", "success", "Bot");
-        text_content = "";
-        return speak("I'm a trash bot");
-    }
-
-    if(text_content == "who made you") {
-        createParagraph("I was made by Fuad Olatunji", "success", "Bot");
-        text_content = "";
-        return speak("I was made by Fuad Olatunji");
-    }
-
-    if(text_content == "what is your name") {
-        createParagraph("I wasn't given a name", "success", "Bot");
-        text_content = "";
-        return speak("I wasn't given a name");
-    }
-
     createParagraph(text_content, "warning", "You");
 
-    if(text_content.length < 23) {
-        createParagraph("I don't know", "danger", "Bot");
+    if(!text_content.includes("what's the weather") && !text_content.includes("what is the weather")) {
+        createParagraph("Invalid query ⚠", "danger", "Bot");
         speak("I don't know");
+        return text_content = "";
     }
 
-    cityName = text_content.substring(23).trim();
+    if(text_content.includes("what's the weather")){
+        cityName = text_content.substring(22).trim();
+    } else if(text_content.includes("what is the weather")){
+        cityName = text_content.substring(23).trim();
+    }
+
     getWeather(cityName);
     text_content = "";
 
@@ -163,12 +154,5 @@ recognition.addEventListener("end", (e)=>{
 //#endregion
 
 //#region service worker 
-if ("serviceWorker" in navigator) {
-    window.addEventListener("load", function() {
-        navigator.serviceWorker
-            .register("../serviceWorker.js")
-            .then(res => console.log("service worker registered"))
-            .catch(err => console.log("service worker not registered", err))
-    })
-}
+
 //#endregion
