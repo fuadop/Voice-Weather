@@ -27,3 +27,8 @@ if (!navigator.onLine){
     },2000)
 }
 
+document.querySelectorAll(".voice-toggle").forEach( el => {
+    el.addEventListener("click", e => {
+        speak(el.textContent.substring(3));
+    })
+})

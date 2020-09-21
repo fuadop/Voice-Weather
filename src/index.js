@@ -88,7 +88,6 @@ function getWeather(cityName){
             }
         ).then(
             data => {
-                console.log(data);
                 if(data.cod == "400" || data.cod == "404"){
                     createParagraph("I'm sorry, I couldn't get the weather you asked for, try another location 🙏", "danger", "Bot");
                     speak("I'm sorry, I couldn't get the weather you asked for, try another location");
@@ -135,13 +134,32 @@ function getLocationWeather(currentLocation){
     })
 }
 
-function getForecast(cityName){
+function getRainForecast(cityName){
     const QUERY_URL = `https://api.weatherapi.com/v1/forecast.json?q=${cityName}&days=2&key=${API_KEY}`;
     fetch(QUERY_URL)
     .then(res => res.json())
-    .then(data => console.log(data.forecast.forecastday[1].day))
+    .then(data => {
+        createParagraph(
+            `Tomorrow's forecast of ${data.location.name}, ${data.location.country} states there is ${data.forecast.forecastday[1].day.daily_chance_of_rain}% chance of rain tomorrow`
+            ,"primary", "Bot"
+        );
+        speak(`Tomorrow's forecast of ${data.location.name}, ${data.location.country} states there is ${data.forecast.forecastday[1].day.daily_chance_of_rain} percent chance of rain tomorrow`);
+    })
 }
-getForecast("Abuja");
+
+function getTempForecast(cityName){
+    const QUERY_URL = `https://api.weatherapi.com/v1/forecast.json?q=${cityName}&days=2&key=${API_KEY}`;
+    fetch(QUERY_URL)
+    .then(res => res.json())
+    .then(data => {
+        createParagraph(
+            `Tomorrow's forecast of ${data.location.name}, ${data.location.country} states there would be an average temperature of ${data.forecast.forecastday[1].day.avgtemp_c} celcius tomorrow`
+            ,"primary", "Bot"
+        );
+        speak(`Tomorrow's forecast of ${data.location.name}, ${data.location.country} states there would be an average temperature of ${data.forecast.forecastday[1].day.avgtemp_c} celcius tomorrow`);
+    })
+}
+
 setInterval(()=>{
     continousText.textContent= text_content;
 });
@@ -173,31 +191,34 @@ recognition.addEventListener("error", (e)=>{
 });
 
 recognition.addEventListener("end", (e)=>{
+    let cityName;
     if(text_content == "") {
         return;
     }
     createParagraph(text_content, "warning", "You");
 
-    if(text_content.includes("current location" )){
-        getCurrentLocationWeather();
-        return text_content = "";
-    }
-    
-    if(!text_content.includes("what's the weather") && !text_content.includes("what is the weather")) {
+    if(!text_content.includes("what's the weather") && !text_content.includes("what is the weather") && !text_content.includes("current location") && !text_content.includes("rain forecast of") && !text_content.includes("temperature forecast of")) {
         createParagraph("Invalid query ⚠", "danger", "Bot");
         speak("I don't know");
         return text_content = "";
     }
 
-    if(text_content.includes("what's the weather")){
+    if(text_content.includes("current location")){
+        getCurrentLocationWeather();
+    } else if(text_content.includes("rain forecast of")){
+        cityName = text_content.substring(17).trim();
+        getRainForecast(cityName);
+    } if(text_content.includes("temperature forecast of")){
+        cityName = text_content.substring(24).trim();
+        getTempForecast(cityName);
+    } else if(text_content.includes("what's the weather")){
         cityName = text_content.substring(22).trim();
+        getWeather(cityName);
     } else if(text_content.includes("what is the weather")){
         cityName = text_content.substring(23).trim();
+        getWeather(cityName);
     }
 
-    
-
-    getWeather(cityName);
     text_content = "";
 
 });
