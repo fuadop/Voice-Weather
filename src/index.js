@@ -78,7 +78,7 @@ function createParagraph(content, bsColor, character){
 
 function getWeather(cityName){
     if(cityName && (cityName != "" || cityName != null || cityName != undefined)){
-        const QUERY_URL = `http://api.weatherapi.com/v1/current.json?q=${cityName}&key=${API_KEY}`
+        const QUERY_URL = `https://api.weatherapi.com/v1/current.json?q=${cityName}&key=${API_KEY}`
         fetch(QUERY_URL)
         .then(
             res => {
@@ -118,7 +118,7 @@ function getCurrentLocationWeather(){
 function getLocationWeather(currentLocation){
     let lat = currentLocation.coords.latitude;
     let lon = currentLocation.coords.longitude;
-    const GEO_URL = `http://api.weatherapi.com/v1/current.json?q=${lat},${lon}&key=${API_KEY}`;
+    const GEO_URL = `https://api.weatherapi.com/v1/current.json?q=${lat},${lon}&key=${API_KEY}`;
     fetch(GEO_URL)
     .then(resp => resp.json())
     .then( data => {
@@ -135,6 +135,13 @@ function getLocationWeather(currentLocation){
     })
 }
 
+function getForecast(cityName){
+    const QUERY_URL = `https://api.weatherapi.com/v1/forecast.json?q=${cityName}&days=2&key=${API_KEY}`;
+    fetch(QUERY_URL)
+    .then(res => res.json())
+    .then(data => console.log(data.forecast.forecastday[1].day))
+}
+getForecast("Abuja");
 setInterval(()=>{
     continousText.textContent= text_content;
 });
