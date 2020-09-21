@@ -133,10 +133,10 @@ function getLocationTempForecast(currentLocation){
     .then(resp => resp.json())
     .then( data => {
         createParagraph(
-            `Tomorrow's forecast of ${data.location.name}, ${data.location.country} states there is ${data.forecast.forecastday[1].day.daily_chance_of_rain}% chance of rain tomorrow`
+            `Tomorrow's forecast of ${data.location.name}, ${data.location.country} states there would be an average temperature of ${data.forecast.forecastday[1].day.avgtemp_c} celcius tomorrow`
             ,"primary", "Bot"
         );
-        speak(`Tomorrow's forecast of ${data.location.name}, ${data.location.country} states there is ${data.forecast.forecastday[1].day.daily_chance_of_rain} percent chance of rain tomorrow`);
+        speak(`Tomorrow's forecast of ${data.location.name}, ${data.location.country} states there would be an average temperature of ${data.forecast.forecastday[1].day.avgtemp_c} celcius tomorrow`);
     }).catch( err => {
         if(err instanceof TypeError) {
         } else {
@@ -153,12 +153,11 @@ function getLocationRainForecast(currentLocation){
     fetch(GEO_URL)
     .then(resp => resp.json())
     .then( data => {
-        console.log(data);
         createParagraph(
-            `Tomorrow's forecast of ${data.location.name}, ${data.location.country} states there would be an average temperature of ${data.forecast.forecastday[1].day.avgtemp_c} celcius tomorrow`
+            `Tomorrow's forecast of ${data.location.name}, ${data.location.country} states there is ${data.forecast.forecastday[1].day.daily_chance_of_rain}% chance of rain tomorrow`
             ,"primary", "Bot"
         );
-        speak(`Tomorrow's forecast of ${data.location.name}, ${data.location.country} states there would be an average temperature of ${data.forecast.forecastday[1].day.avgtemp_c} celcius tomorrow`);
+        speak(`Tomorrow's forecast of ${data.location.name}, ${data.location.country} states there is ${data.forecast.forecastday[1].day.daily_chance_of_rain} percent chance of rain tomorrow`);
     }).catch( err => {
         if(err instanceof TypeError) {
         } else {
