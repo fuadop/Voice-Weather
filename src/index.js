@@ -105,6 +105,21 @@ function getWeather(cityName){
     }
 }
 
+if("geolocation" in navigator){
+    navigator.geolocation.getCurrentPosition(getLocationWeather);
+}
+
+function getLocationWeather(currentLocation){
+    let lat = Math.floor(currentLocation.coords.latitude);
+    let long = Math.floor(currentLocation.coords.longitude)
+    console.log(lat);
+    console.log(long);
+    const GEO_URL = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&long=${long}&appid=${API_KEY}&units=metric`;
+    fetch(GEO_URL)
+    .then(resp => resp.json())
+    .then( data => console.log(data))
+}
+
 setInterval(()=>{
     continousText.textContent= text_content;
 });
@@ -170,4 +185,6 @@ if("serviceWorker" in navigator){
 } else {
     console.log("Service worker not supported");
 }
+
+getLocationWeather();
 //#endregion
