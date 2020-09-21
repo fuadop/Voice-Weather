@@ -114,6 +114,60 @@ function getCurrentLocationWeather(){
     }
 }
 
+function getCurrentLocationRainForecast(){
+    if("geolocation" in navigator){
+        navigator.geolocation.getCurrentPosition(getLocationRainForecast);
+    }
+}
+
+function getCurrentLocationTempForecast(){
+    if("geolocation" in navigator){
+        navigator.geolocation.getCurrentPosition(getLocationTempForecast);
+    }
+}
+function getLocationTempForecast(currentLocation){
+    let lat = currentLocation.coords.latitude;
+    let lon = currentLocation.coords.longitude;
+    const GEO_URL = `https://api.weatherapi.com/v1/forecast.json?q=${lat},${lon}&days=2&key=${API_KEY}`;
+    fetch(GEO_URL)
+    .then(resp => resp.json())
+    .then( data => {
+        createParagraph(
+            `Tomorrow's forecast of ${data.location.name}, ${data.location.country} states there is ${data.forecast.forecastday[1].day.daily_chance_of_rain}% chance of rain tomorrow`
+            ,"primary", "Bot"
+        );
+        speak(`Tomorrow's forecast of ${data.location.name}, ${data.location.country} states there is ${data.forecast.forecastday[1].day.daily_chance_of_rain} percent chance of rain tomorrow`);
+    }).catch( err => {
+        if(err instanceof TypeError) {
+        } else {
+            createParagraph("An error occured🙏, you might be offline", "danger", "Bot");
+            speak("An error occured, you might be offline");
+        }
+    })
+}
+
+function getLocationRainForecast(currentLocation){
+    let lat = currentLocation.coords.latitude;
+    let lon = currentLocation.coords.longitude;
+    const GEO_URL = `https://api.weatherapi.com/v1/forecast.json?q=${lat},${lon}&days=2&key=${API_KEY}`;
+    fetch(GEO_URL)
+    .then(resp => resp.json())
+    .then( data => {
+        console.log(data);
+        createParagraph(
+            `Tomorrow's forecast of ${data.location.name}, ${data.location.country} states there would be an average temperature of ${data.forecast.forecastday[1].day.avgtemp_c} celcius tomorrow`
+            ,"primary", "Bot"
+        );
+        speak(`Tomorrow's forecast of ${data.location.name}, ${data.location.country} states there would be an average temperature of ${data.forecast.forecastday[1].day.avgtemp_c} celcius tomorrow`);
+    }).catch( err => {
+        if(err instanceof TypeError) {
+        } else {
+            createParagraph("An error occured🙏, you might be offline", "danger", "Bot");
+            speak("An error occured, you might be offline");
+        }
+    })
+}
+
 function getLocationWeather(currentLocation){
     let lat = currentLocation.coords.latitude;
     let lon = currentLocation.coords.longitude;
@@ -144,6 +198,12 @@ function getRainForecast(cityName){
             ,"primary", "Bot"
         );
         speak(`Tomorrow's forecast of ${data.location.name}, ${data.location.country} states there is ${data.forecast.forecastday[1].day.daily_chance_of_rain} percent chance of rain tomorrow`);
+    }).catch( err => {
+        if(err instanceof TypeError) {
+        } else {
+            createParagraph("An error occured🙏, you might be offline", "danger", "Bot");
+            speak("An error occured, you might be offline");
+        }
     })
 }
 
@@ -157,6 +217,12 @@ function getTempForecast(cityName){
             ,"primary", "Bot"
         );
         speak(`Tomorrow's forecast of ${data.location.name}, ${data.location.country} states there would be an average temperature of ${data.forecast.forecastday[1].day.avgtemp_c} celcius tomorrow`);
+    }).catch( err => {
+        if(err instanceof TypeError) {
+        } else {
+            createParagraph("An error occured🙏, you might be offline", "danger", "Bot");
+            speak("An error occured, you might be offline");
+        }
     })
 }
 
@@ -203,8 +269,15 @@ recognition.addEventListener("end", (e)=>{
         return text_content = "";
     }
 
-    if(text_content.includes("current location")){
+    if(text_content.includes("current location rain forecast")){
+        getCurrentLocationRainForecast();
+        return text_content ="";
+    } else if(text_content.includes("current location temperature forecast")){
+        getCurrentLocationTempForecast();
+        return text_content ="";
+    } else if(text_content.includes("current location")){
         getCurrentLocationWeather();
+        return text_content ="";
     } else if(text_content.includes("rain forecast of")){
         cityName = text_content.substring(17).trim();
         getRainForecast(cityName);
