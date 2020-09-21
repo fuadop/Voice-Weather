@@ -1,5 +1,5 @@
 # Voice Weather
-![Logo](images/icons/apple-icon-180x180.png)
+![Logo](/images/icons/icon-144x144.png)
 __Search for weather using your voice__
 
 ## Tools
