@@ -11,7 +11,8 @@ const staticCacheAssets = [
     "/images/icons/favicon.ico",
     "https://kit.fontawesome.com/60bdf815fa.js",
     "https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css",
-    "https://fonts.googleapis.com/css2?family=Balsamiq+Sans:wght@400;700&family=Indie+Flower&display=swap"
+    "https://fonts.googleapis.com/css2?family=Balsamiq+Sans:wght@400;700&family=Indie+Flower&display=swap",
+    "https://kit-free.fontawesome.com"
 ]
 
 self.addEventListener("install", event => {

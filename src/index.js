@@ -9,7 +9,7 @@ const nav = document.querySelector(".navbar");
 
 //#region utils
 let text_content = "";
-const API_KEY = "217fbb0f9f2a516da177fffe3cc1bef9";
+const API_KEY = "c4f6f093cdae42088cb131148202109";
 const DURATION = 7000;
 const syth = window.speechSynthesis;
 let voices;
@@ -73,12 +73,12 @@ function createParagraph(content, bsColor, character){
     voiceTextContainer.appendChild(text);
     setTimeout(()=> {
         voiceTextContainer.removeChild(text);
-    }, 10000)
+    }, 12000)
 }
 
 function getWeather(cityName){
     if(cityName && (cityName != "" || cityName != null || cityName != undefined)){
-        const QUERY_URL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${API_KEY}&units=metric`
+        const QUERY_URL = `http://api.weatherapi.com/v1/current.json?q=${cityName}&key=${API_KEY}`
         fetch(QUERY_URL)
         .then(
             res => {
@@ -88,16 +88,20 @@ function getWeather(cityName){
             }
         ).then(
             data => {
+                console.log(data);
                 if(data.cod == "400" || data.cod == "404"){
                     createParagraph("I'm sorry, I couldn't get the weather you asked for, try another location 🙏", "danger", "Bot");
                     speak("I'm sorry, I couldn't get the weather you asked for, try another location");
                 }
-                createParagraph(`The teperature in ${cityName} is ${data.main.temp.toString()} Celsius and atmosphere is ${data.weather[0].description.toString()} and has an humidity of ${data.main.humidity.toString()}`, "primary", "Bot");
-                speak(`The teperature in ${cityName} is ${data.main.temp.toString()} Celsius and atmosphere is ${data.weather[0].description.toString()} and has an humidity of ${data.main.humidity.toString()}`);
+                createParagraph(`The teperature in ${data.location.name}, ${data.location.country} is ${data.current.temp_c.toString()} Celsius and atmosphere is ${data.current.condition.text.toString()} and has an humidity of ${data.current.humidity.toString()}`, "primary", "Bot");
+                speak(`The teperature in ${data.location.name}, ${data.location.country} is ${data.current.temp_c.toString()} Celsius and atmosphere is ${data.current.condition.text.toString()} and has an humidity of ${data.current.humidity.toString()}`);
             }
         ).catch( err => {
-            createParagraph("An error occured🙏, you might be offline", "danger", "Bot");
-            speak("An error occured, you might be offline");
+            if(err instanceof TypeError) {
+            } else {
+                createParagraph("An error occured🙏, you might be offline", "danger", "Bot");
+                speak("An error occured, you might be offline");
+            }
         })
     } else {
         createParagraph("You have to state a location 📢","danger", "Bot");
@@ -105,19 +109,30 @@ function getWeather(cityName){
     }
 }
 
-if("geolocation" in navigator){
-    navigator.geolocation.getCurrentPosition(getLocationWeather);
+function getCurrentLocationWeather(){
+    if("geolocation" in navigator){
+        navigator.geolocation.getCurrentPosition(getLocationWeather);
+    }
 }
 
 function getLocationWeather(currentLocation){
-    let lat = Math.floor(currentLocation.coords.latitude);
-    let long = Math.floor(currentLocation.coords.longitude)
-    console.log(lat);
-    console.log(long);
-    const GEO_URL = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&long=${long}&appid=${API_KEY}&units=metric`;
+    let lat = currentLocation.coords.latitude;
+    let lon = currentLocation.coords.longitude;
+    const GEO_URL = `http://api.weatherapi.com/v1/current.json?q=${lat},${lon}&key=${API_KEY}`;
     fetch(GEO_URL)
     .then(resp => resp.json())
-    .then( data => console.log(data))
+    .then( data => {
+        createParagraph(`Your current location is ${data.location.name}, ${data.location.country}`, "primary", "bot");
+        speak(`Your current location is ${data.location.name}, ${data.location.country}`);
+        createParagraph(`The teperature in ${data.location.name}, ${data.location.country} is ${data.current.temp_c.toString()} Celsius and atmosphere is ${data.current.condition.text.toString()} and has an humidity of ${data.current.humidity.toString()}`, "primary", "Bot");
+        speak(`The teperature in ${data.location.name}, ${data.location.country} is ${data.current.temp_c.toString()} Celsius and atmosphere is ${data.current.condition.text.toString()} and has an humidity of ${data.current.humidity.toString()}`);
+    }).catch( err => {
+        if(err instanceof TypeError) {
+        } else {
+            createParagraph("An error occured🙏, you might be offline", "danger", "Bot");
+            speak("An error occured, you might be offline");
+        }
+    })
 }
 
 setInterval(()=>{
@@ -156,6 +171,11 @@ recognition.addEventListener("end", (e)=>{
     }
     createParagraph(text_content, "warning", "You");
 
+    if(text_content.includes("current location" )){
+        getCurrentLocationWeather();
+        return text_content = "";
+    }
+    
     if(!text_content.includes("what's the weather") && !text_content.includes("what is the weather")) {
         createParagraph("Invalid query ⚠", "danger", "Bot");
         speak("I don't know");
@@ -167,6 +187,8 @@ recognition.addEventListener("end", (e)=>{
     } else if(text_content.includes("what is the weather")){
         cityName = text_content.substring(23).trim();
     }
+
+    
 
     getWeather(cityName);
     text_content = "";
@@ -186,5 +208,4 @@ if("serviceWorker" in navigator){
     console.log("Service worker not supported");
 }
 
-getLocationWeather();
 //#endregion
