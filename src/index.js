@@ -71,6 +71,9 @@ function createParagraph(content, bsColor, character){
         </div>
     `
     voiceTextContainer.appendChild(text);
+    setTimeout(()=> {
+        voiceTextContainer.removeChild(text);
+    }, 10000)
 }
 
 function getWeather(cityName){
@@ -92,7 +95,10 @@ function getWeather(cityName){
                 createParagraph(`The teperature in ${cityName} is ${data.main.temp.toString()} Celsius and atmosphere is ${data.weather[0].description.toString()} and has an humidity of ${data.main.humidity.toString()}`, "primary", "Bot");
                 speak(`The teperature in ${cityName} is ${data.main.temp.toString()} Celsius and atmosphere is ${data.weather[0].description.toString()} and has an humidity of ${data.main.humidity.toString()}`);
             }
-        )
+        ).catch( err => {
+            createParagraph("An error occured🙏, you might be offline", "danger", "Bot");
+            speak("An error occured, you might be offline");
+        })
     } else {
         createParagraph("You have to state a location 📢","danger", "Bot");
         speak("You have to state a location");
@@ -154,5 +160,14 @@ recognition.addEventListener("end", (e)=>{
 //#endregion
 
 //#region service worker 
-
+if("serviceWorker" in navigator){
+    navigator.serviceWorker.register("/serviceWorker.js")
+    .then(
+        reg => console.log("Service worker registered")
+    ). catch (
+        err => console.log("Service worker not registered")
+    )
+} else {
+    console.log("Service worker not supported");
+}
 //#endregion
